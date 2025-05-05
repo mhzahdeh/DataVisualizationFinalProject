@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Global Economic Trends - Mohammad Zahedah</title>
+    <style>
+      body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+
+      header{
+        background-color: #006d2c;
+        color: white;
+        text-align: center;
+      }
+
+
+      iframe {
+        width: 100%;
+        max-width: 600px;
+        height: 400px;
+        border: none;
+      }
+      .wideChart {
+        width: 100%;
+        max-width: 1300px;
+        height: 900px;
+        margin: 0 auto;
+        display: block;
+      }
+      .scoreChart {
+        width: 100%;
+        max-width: 1700px;
+        height: 900px;
+        margin: 0 auto;
+        display: block;
+      }
+
+      .chart-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .chart-group iframe {
+        flex: 1 1 0px;
+        max-width: 45%;
+        height: 350px;
+      }
+
+      a {
+        color: #007acc;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <br>
+      <h1>ExploringGlobal Economic Happiness Trends</h1>
+      <p>
+        Mohammad Zahedah | mhzahdeh@dons.usfca.edu
+      </p>
+      <p>CS360 - Data Visualization Final Project</p>
+      <p>
+        Check it out: <a href="https://github.com/mhzahdeh/dataVizFinalProject.git"
+          >View Github Repository</a
+        >
+      </p>
+      <br> 
+    </header>
+
+    <main>
+      <section>
+        <h2> About the Project</h2>
+        <p>
+          This project explores global economic trends to identify the best
+          countries for young individuals to start their professional careers.
+          It combines my passion in global macroeconomics with data visualization to
+          tell a story.
+        </p>
+      </section>
+
+      <section>
+        <h2> Project Objectives</h2>
+        <ul>
+          <li>
+            Showcase which countries offer the best starting points for young
+            professionals globally.
+          </li>
+          <li>
+            Highlight where economic success can be achieved over the long term.
+          </li>
+          <li>
+            Visualize global wealth investments via hedge funds and
+            high-net-worth individuals.
+          </li>
+          <li>
+            Identify the healthiest and happiest places to live based on life
+            expectancy data.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2> Visualizations</h2>
+
+        <h3> Life Expectancy by Country</h3>
+        <iframe
+          class="wideChart"
+          src="Life Expectancy by Country/index.html"
+        ></iframe>
+
+        <h3> Starting Salaries by Country</h3>
+        <iframe
+          class="wideChart"
+          src="Starting Salaries by Country/index.html"
+        ></iframe>
+
+        <h3> Global Hedge Funds (AUM)</h3>
+        <iframe
+          class="wideChart"
+          src="Global Hedge Funds (AUM)/index.html"
+        ></iframe>
+       
+        <br> 
+
+        <h3> GDP Trends - Small Multiples</h3>
+        <div class="chart-group">
+          <iframe
+            src="GDP Trends - Small Multiples/north-america-gdp-chart/index.html"
+          ></iframe>
+          <iframe
+            src="GDP Trends - Small Multiples/south-america-gdp-chart/index.html"
+          ></iframe>
+          <iframe
+            src="GDP Trends - Small Multiples/eastern-europe-gdp-chart/index.html"
+          ></iframe>
+          <iframe
+            src="GDP Trends - Small Multiples/nw-europe-gdp-chart/index.html"
+          ></iframe>
+        </div>
+        <div class="chart-group">
+          <iframe
+            src="GDP Trends - Small Multiples/asia-gdp-chart/index.html"
+          ></iframe>
+          <iframe
+            src="GDP Trends - Small Multiples/middle-east-gdp-chart/index.html"
+          ></iframe>
+          <iframe
+            src="GDP Trends - Small Multiples/caribbean-gdp-chart/index.html"
+          ></iframe>
+          <iframe
+            src="GDP Trends - Small Multiples/other-gdp-chart/index.html"
+          ></iframe>
+        </div>
+        
+        <h3> GDP Per Capita Over 5 Years</h3>
+        <iframe
+          class="wideChart"
+          src="GDP Dot Plot/index.html"
+        ></iframe>
+        <h3> Scoring Map</h3>
+        <iframe
+          class="scoreChart"
+          src="Choropleth Map/index.html"
+        ></iframe>
+      </section>
+      
+    <section>
+        <h2>Data Sources and Processing</h2>
+        <ul>
+          <li>
+            <strong>GDP Per Capita (2019–2023):</strong> Multi-line charts & dot plot using
+            World Bank data (filtered by country and year).
+          </li>
+          <li>
+            <strong>Global Hedge Funds:</strong> Treemap using Kaggle data
+            (Assets under Management per country).
+          </li>
+          <li>
+            <strong>Life Expectancy by Country:</strong> Bar chart using
+            Worldometers data (male and female averages).
+          </li>
+          <li>
+            <strong>Starting Salaries by Country:</strong> Dot plot using
+            WorldData.info.
+          </li>
+          <li>
+            <strong>Scoring Map:</strong> Choropleth map using
+            combining all the data above.
+          </li>
+        </ul>
+    </main>
+  </body>
+</html>

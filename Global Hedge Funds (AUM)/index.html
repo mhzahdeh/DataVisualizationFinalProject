@@ -1,0 +1,203 @@
+<!-- //Mohammad Zahedah //Data Visualization Final Project
+Visualization // Professor Alark Joshi // Special Thanks to
+Curran Kelleher whom helped me create this chart -->
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style>
+  html,
+  body,
+  /* basic styling  */
+  #my_dataviz {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    font-family: sans-serif;
+  }
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<div id="my_dataviz"></div>
+
+<script>
+  // Get the container dimensions
+  function getContainerDimensions() {
+    const container = document.getElementById('my_dataviz');
+    return {
+      width: container.clientWidth,
+      height: container.clientHeight,
+    };
+  }
+
+  // Determine if color is light --> text color
+  function isLight(color) {
+    const rgb = d3.rgb(color);
+    const brightness =
+      (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+    return brightness > 128;
+  }
+
+  // Create visualization with responsive dimensions
+  function createViz() {
+    // Clear existing SVG
+    d3.select('#my_dataviz').selectAll('svg').remove();
+
+    // Get current dimensions
+    const containerDims = getContainerDimensions();
+
+    const margin = {
+      top: 80,
+      right: 20,
+      bottom: 20,
+      left: 20,
+    };
+    const width =
+      containerDims.width - margin.left - margin.right;
+    const height =
+      containerDims.height - margin.top - margin.bottom;
+    // appending svg and group element
+    const svg = d3
+      .select('#my_dataviz')
+      .append('svg')
+      .attr('width', containerDims.width)
+      .attr('height', containerDims.height)
+      .append('g')
+      .attr(
+        'transform',
+        'translate(' + margin.left + ',' + margin.top + ')',
+      );
+    var tooltip = d3
+      .select('#my_dataviz')
+      .append('div')
+      .style('opacity', 0)
+      .attr('class', 'tooltip')
+      .style('position', 'absolute')
+      .style('background-color', 'white')
+      .style('border', 'solid')
+      .style('border-width', '1px')
+      .style('border-radius', '5px')
+      .style('padding', '10px')
+      .style('pointer-events', 'none')
+      .style('font-size', '12px');
+
+    var mouseover = function (event, d) {
+      tooltip
+        .style('opacity', 1)
+        .html(
+          'Country: ' +
+            d.data.name +
+            '<br>' +
+            'Total Assets Under Managment: $' +
+            d.data.value,
+        );
+    };
+
+    var mousemove = function (event, d) {
+      tooltip
+        .style('left', event.pageX + 10 + 'px')
+        .style('top', event.pageY + 10 + 'px');
+    };
+
+    var mouseleave = function () {
+      tooltip.style('opacity', 0);
+    };
+    // title
+    svg
+      .append('text')
+      .attr('x', width / 2)
+      .attr('y', -20)
+      .attr('text-anchor', 'middle')
+      .style('font-size', '20px')
+      .text('Hedge Funds by Assets Under Managment (AUM)');
+    // data source annotation
+    svg
+      .append('text')
+      .attr('x', width - 200)
+      .attr('y', height + 15)
+      .attr('font-size', '14px')
+      .attr('fill', 'black')
+      .text('Data Set Source: Kaggle.com ');
+
+    d3.csv('data.csv').then(function (data) {
+      // Prepare data: group & sum AUM by country
+      const countryMap = {};
+      data.forEach(function (d) {
+        const country = d['Firm Country'];
+        const aum = +d['AUM'];
+
+        if (!countryMap[country]) {
+          countryMap[country] = { name: country, value: 0 };
+        }
+        countryMap[country].value += aum;
+      });
+
+      // Convert to hierarchy format
+      const hierarchyData = {
+        name: 'root',
+        children: Object.values(countryMap),
+      };
+
+      // Creating root hierarchy and calculate value sum
+      const root = d3
+        .hierarchy(hierarchyData)
+        .sum((d) => d.value);
+
+      d3.treemap().size([width, height]).padding(1)(root);
+
+      // Color by country
+      const color = d3
+        .scaleOrdinal()
+        .domain(root.leaves().map((d) => d.data.name))
+        .range([
+          '#00441b',
+          '#006d2c',
+          '#238b45',
+          '#41ae76',
+          '#66c2a4',
+          '#99d8c9',
+          '#ccece6',
+          '#e5f5f9',
+          '#f7fcfd',
+        ]);
+
+      // Draw rectangles
+      const cells = svg
+        .selectAll('g')
+        .data(root.leaves())
+        .enter()
+        .append('g')
+        .attr(
+          'transform',
+          (d) => `translate(${d.x0},${d.y0})`,
+        );
+
+      cells
+        .append('rect')
+        .attr('width', (d) => d.x1 - d.x0)
+        .attr('height', (d) => d.y1 - d.y0)
+        .style('stroke', 'black')
+        .style('fill', (d) => color(d.data.name))
+        .on('mouseover', mouseover)
+        .on('mousemove', mousemove)
+        .on('mouseleave', mouseleave);
+
+      cells
+        .append('text')
+        .attr('x', 5)
+        .attr('y', 15)
+        .text((d) => d.data.name)
+        .attr('font-size', '14px')
+        .attr('fill', (d) =>
+          isLight(color(d.data.name)) ? 'black' : 'white',
+        );
+    });
+  }
+
+  // Initial creation
+  createViz();
+
+  // Recreate on window resize
+  window.addEventListener('resize', createViz);
+</script>

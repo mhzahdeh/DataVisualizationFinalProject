@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>D3 Line Chart from CSV</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <style>
+      /* axis styling  */
+      .axis-x path,
+      .axis-y path {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+      }
+      .axis-x .tick line,
+      .axis-y .tick line {
+        stroke: #ccc;
+      }
+      .axis text {
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chart-container"></div>
+    <script>
+      // Set up the SVG container
+      const svgWidth = 500;
+      const svgHeight = 300;
+      const margin = {
+        top: 20,
+        right: 150,
+        bottom: 80,
+        left: 60,
+      };
+      const width = svgWidth - margin.left - margin.right;
+      const height = svgHeight - margin.top - margin.bottom;
+
+      const svg = d3
+        .select('#chart-container')
+        .append('svg')
+        .attr('width', svgWidth)
+        .attr('height', svgHeight)
+        .append('g')
+        .attr(
+          'transform',
+          `translate(${margin.left},${margin.top})`,
+        );
+      // Chart title
+      svg
+        .append('text')
+        .attr('x', width / 2)
+        .attr('y', -5)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '18px')
+        .text('South American Top Countries ');
+      // loading the CSV data
+      d3.csv('sample.csv').then(function (data) {
+        data.forEach(function (d) {
+          d.Country = d.Country;
+          d.GDP1 = +d['2019'].trim();
+          d.GDP2 = +d['2020'].trim();
+          d.GDP3 = +d['2021'].trim();
+          d.GDP4 = +d['2022'].trim();
+          d.GDP5 = +d['2023'].trim();
+        });
+
+        // Define X and Y scales
+        const x = d3
+          .scalePoint()
+          .domain(['2019', '2020', '2021', '2022', '2023'])
+          .range([0, width])
+          .padding(0.01);
+
+        const y = d3
+          .scaleLinear()
+          .domain([
+            0,
+            d3.max(data, (d) =>
+              Math.max(
+                d.GDP1,
+                d.GDP2,
+                d.GDP3,
+                d.GDP4,
+                d.GDP5,
+              ),
+            ),
+          ])
+          .range([height, 0]);
+
+        // Adding axes
+        svg
+          .append('g')
+          .attr('class', 'axis axis-x')
+          .attr('transform', `translate(0, ${height})`)
+          .call(d3.axisBottom(x));
+
+        svg
+          .append('g')
+          .attr('class', 'axis axis-y')
+          .call(d3.axisLeft(y).ticks(5));
+
+        // Color scale
+        const colorScale = d3
+          .scaleOrdinal()
+          .domain(data.map((d) => d.Country))
+          .range(['#66c2a4', '#2ca25f', '#006d2c']);
+
+        // creating a line for each Country
+        data.forEach((d, i) => {
+          const line = d3
+            .line()
+            .x((_, i) =>
+              x(
+                ['2019', '2020', '2021', '2022', '2023'][i],
+              ),
+            )
+            .y((_, i) =>
+              y(
+                [d.GDP1, d.GDP2, d.GDP3, d.GDP4, d.GDP5][i],
+              ),
+            );
+
+          // appending the line
+          svg
+            .append('path')
+            .datum([d.GDP1, d.GDP2, d.GDP3, d.GDP4, d.GDP5])
+            .attr('fill', 'none')
+            .attr('stroke', colorScale(d.Country))
+            .attr('stroke-width', 2)
+            .attr('d', line);
+        });
+
+        // Add legend
+        const legend = d3
+          .legendColor()
+          .title('Legend')
+          .titleWidth(50)
+          .labelWrap(30)
+          .shape('square')
+          .shapeHeight(10)
+          .shapeWidth(20)
+          .orient('vertical')
+          .scale(colorScale);
+
+        // appending the legend
+        svg
+          .append('g')
+          .attr(
+            'transform',
+            'translate(' + (width + 40) + ',50)',
+          )
+          .call(legend);
+      });
+    </script>
+  </body>
+</html>

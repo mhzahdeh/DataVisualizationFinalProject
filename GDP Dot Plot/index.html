@@ -1,0 +1,167 @@
+<!-- //Mohammad Zahedah //Data Visualization Final Project
+Visualization // Professor Alark Joshi -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>D3 Bubble Chart from CSV</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      /* CSS styles for the chart */
+      .bar {
+        fill: green;
+      }
+
+      .axis-x path,
+      .axis-y path {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+      }
+
+      .axis-x .tick line,
+      .axis-y .tick line {
+        stroke: #ccc;
+      }
+
+      .axis text {
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chart-container"></div>
+
+    <script>
+      // Set up the SVG container
+      const svgWidth = 1200;
+      const svgHeight = 800;
+      const margin = {
+        top: 20,
+        right: 20,
+        bottom: 150,
+        left: 60,
+      };
+      const width = svgWidth - margin.left - margin.right;
+      const height = svgHeight - margin.top - margin.bottom;
+
+      const svg = d3
+        .select('#chart-container')
+        .append('svg')
+        .attr('width', svgWidth)
+        .attr('height', svgHeight)
+        .append('g')
+        .attr(
+          'transform',
+          `translate(${margin.left},${margin.top})`,
+        );
+      // Tooltip addition
+      var tooltip = d3
+        .select('#chart-container')
+        .append('div')
+        .style('opacity', 0)
+        .attr('class', 'tooltip')
+        .style('position', 'absolute')
+        .style('background-color', 'white')
+        .style('border', 'solid')
+        .style('border-width', '1px')
+        .style('border-radius', '5px')
+        .style('padding', '10px')
+        .style('pointer-events', 'none')
+        .style('font-size', '12px');
+
+      var mouseover = function (event, d) {
+        tooltip
+          .style('opacity', 1)
+          .html(
+            'Country: ' +
+              d.Country +
+              '<br>' +
+              '2023 GDP: ' +
+              d.GDP,
+          );
+      };
+
+      var mousemove = function (event, d) {
+        tooltip
+          .style('left', event.pageX + 10 + 'px')
+          .style('top', event.pageY + 10 + 'px');
+      };
+
+      var mouseleave = function () {
+        tooltip.style('opacity', 0);
+      };
+
+      svg
+        .append('text')
+        .attr('x', width / 2)
+        .attr('y', -5)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '18px')
+        .text('Top 50 Countries by GDP in 2023');
+
+      // Read data from CSV
+      d3.csv('TopGDPCountries.csv').then(function (data) {
+        data.forEach(function (d) {
+          d.GDP = +d['2023'];
+        });
+
+        // X and Y scales
+        const x = d3
+          .scaleBand()
+          .domain(data.map((d) => d['Country']))
+          .range([0, width])
+          .padding(0.1);
+
+        const y = d3
+          .scaleLinear()
+          .domain([0, d3.max(data, (d) => d.GDP)])
+          .nice()
+          .range([height, 0]);
+        svg
+          .append('g')
+          .attr('class', 'axis axis-x')
+          .attr('transform', `translate(0, ${height})`)
+          .call(d3.axisBottom(x))
+          .selectAll('text')
+          .attr('transform', 'rotate(-65)')
+          .style('text-anchor', 'end');
+
+        svg
+          .append('g')
+          .attr('class', 'axis axis-y')
+          .call(d3.axisLeft(y).ticks(10));
+
+        svg
+          .selectAll('circle')
+          .data(data)
+          .enter()
+          .append('circle')
+          .attr(
+            'cx',
+            (d) => x(d['Country']) + x.bandwidth() / 2,
+          )
+          .attr('cy', (d) => y(d.GDP))
+          .attr('r', 7)
+          .attr('fill', 'green')
+          .attr('opacity', 1)
+          .on('mouseover', mouseover)
+          .on('mousemove', mousemove)
+          .on('mouseleave', mouseleave);
+
+        // Source Annotation
+        svg
+          .append('text')
+          .attr('x', 1200)
+          .attr('y', 780)
+          .attr('font-size', '14px')
+          .attr('fill', 'black')
+          .text('Data Set Source: Worlddata.info ');
+      });
+    </script>
+  </body>
+</html>
